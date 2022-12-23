@@ -18,5 +18,29 @@ variable "resource_name_prefix" {
   type        = string
 }
 
+variable "consul_server_source_image" {
+  description = "The Google Image used to launch each node in the Consul Server cluster."
+  type        = string
+}
+
+variable "vault_cluster_name" {
+  description = "The name of the Vault Server cluster. All resources will be namespaced by this value. E.g. vault-server-prod"
+  type        = string
+}
+
+
+variable "consul_server_cluster_name" {
+  description = "The name of the Consul Server cluster. All resources will be namespaced by this value. E.g. consul-server-prod"
+  type        = string
+}
+
+variable "shutdown_script" {
+  description = "The name of the Consul Server cluster. All resources will be namespaced by this value. E.g. consul-server-prod"
+  type        = string
+}
+
+
+
+
 
 

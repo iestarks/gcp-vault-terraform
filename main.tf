@@ -1,8 +1,8 @@
 module "vault" {
-  source               = "hashicorp/vault-starter/gcp"
-  version              = "0.1.0"
+  source               = "../terraform-gcp-vault-ent-starter"
 
-  # The shared DNS SAN of the TLS certs being used
+
+  /* # The shared DNS SAN of the TLS certs being used
   leader_tls_servername  = local.leader_tls_servername
   #Your GCP project ID
   project_id             = var.gcp_project_id
@@ -13,16 +13,28 @@ module "vault" {
   # Name of the SSL Certificate to be used for Vault LB
   ssl_certificate_name   = local.ssl_certificate_name 
   # Secret id/name given to the google secret manager secret
-  tls_secret_id          = local.tls_secret_id 
+  tls_secret_id          = local.tls_secret_id  */
+
+
+
+  subnetwork                  = google_compute_subnetwork.private_subnet_with_google_api_access.self_link 
+  resource_name_prefix        = var.resource_name_prefix  
+  vault_license_filepath        = var.vault_license_filepath  
+  project_id                  = var.project_id            
+  ssl_certificate_name        = var.ssl_certificate_name           
+  tls_secret_id               = var.tls_secret_id         
+  leader_tls_servername       = var.leader_tls_servername  
+   
+        
 }
 
 module "vpc" {
-    source  = "git@github.com:iestarks/terraform-google-network.git?ref=master"
+    source  = "../terraform-google-network/modules/vpc"
     project_id   = var.gcp_project_id
     network_name = local.network_name
     routing_mode = "GLOBAL"
 
-    subnets = [
+    /* subnets = [
         {
             subnet_name           = "subnet-01"
             subnet_ip             = "10.10.10.0/24"
@@ -74,5 +86,5 @@ module "vpc" {
             next_hop_instance      = "app-proxy-instance"
             next_hop_instance_zone = "us-west1-a"
         },
-    ]
+    ] */
 }
