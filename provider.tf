@@ -1,9 +1,9 @@
 provider "google" {
-  project = "my-project-id"
-  region  = "us-west1"
+  project = var.gcp_project_id
+  region  = var.gcp_region
 }
 
 provider "google-beta" {
-  project = "my-project-id"
-  region  = "us-west1"
+  project = var.gcp_project_id
+  region  = var.gcp_region
 }

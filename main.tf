@@ -3,7 +3,7 @@ module "vault" {
   version              = "0.1.0"
 
   # The shared DNS SAN of the TLS certs being used
-  leader_tls_servername  = var.leader_tls_servername
+  leader_tls_servername  = local.leader_tls_servername
   #Your GCP project ID
   project_id             = var.gcp_project_id
   # Prefix for uniquely identifying GCP resources
@@ -14,4 +14,65 @@ module "vault" {
   ssl_certificate_name   = local.ssl_certificate_name 
   # Secret id/name given to the google secret manager secret
   tls_secret_id          = local.tls_secret_id 
+}
+
+module "vpc" {
+    source  = "git@github.com:iestarks/terraform-google-network.git?ref=master"
+    project_id   = var.gcp_project_id
+    network_name = local.network_name
+    routing_mode = "GLOBAL"
+
+    subnets = [
+        {
+            subnet_name           = "subnet-01"
+            subnet_ip             = "10.10.10.0/24"
+            subnet_region         = "us-west1"
+        },
+        {
+            subnet_name           = "subnet-02"
+            subnet_ip             = "10.10.20.0/24"
+            subnet_region         = "us-west1"
+            subnet_private_access = "true"
+            subnet_flow_logs      = "true"
+            description           = "This subnet has a description"
+        },
+        {
+            subnet_name               = "subnet-03"
+            subnet_ip                 = "10.10.30.0/24"
+            subnet_region             = "us-west1"
+            subnet_flow_logs          = "true"
+            subnet_flow_logs_interval = "INTERVAL_10_MIN"
+            subnet_flow_logs_sampling = 0.7
+            subnet_flow_logs_metadata = "INCLUDE_ALL_METADATA"
+        }
+    ]
+
+    secondary_ranges = {
+        subnet-01 = [
+            {
+                range_name    = "subnet-01-secondary-01"
+                ip_cidr_range = "192.168.64.0/24"
+            },
+        ]
+
+        subnet-02 = []
+    }
+
+    routes = [
+        {
+            name                   = "egress-internet"
+            description            = "route through IGW to access internet"
+            destination_range      = "0.0.0.0/0"
+            tags                   = "egress-inet"
+            next_hop_internet      = "true"
+        },
+        {
+            name                   = "app-proxy"
+            description            = "route through proxy to reach app"
+            destination_range      = "10.50.10.0/24"
+            tags                   = "app-proxy"
+            next_hop_instance      = "app-proxy-instance"
+            next_hop_instance_zone = "us-west1-a"
+        },
+    ]
 }
